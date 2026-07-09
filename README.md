@@ -13,7 +13,7 @@
 <h1 align="center">🛡️ Snort Custom IDS/IPS Rules</h1>
 
 <p align="center">
-Professional custom Snort detection rules for identifying common network attacks including reconnaissance, brute-force attempts, web application attacks, malware activity, and data exfiltration.
+Enterprise-grade Snort 3 IDS/IPS detection rules for identifying reconnaissance, web application attacks, brute-force attempts, malware activity, command-and-control traffic, DNS abuse, SMB attacks, and data exfiltration. Designed, tested, and validated on Kali Linux using Snort 3.
 </p>
 
 ---
