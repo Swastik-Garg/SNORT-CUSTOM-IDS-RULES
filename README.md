@@ -1,3 +1,11 @@
+# Snort Custom IDS/IPS Rules
+
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Snort](https://img.shields.io/badge/Snort-3.x-red)
+![Platform](https://img.shields.io/badge/Platform-Kali%20Linux-blue)
+![Status](https://img.shields.io/badge/Status-Tested-success)
+![Detection](https://img.shields.io/badge/Detection-31%20Rules-orange)
+
 <p align="center">
   <img src="images/banner.png" alt="Snort Custom IDS IPS Rules Banner" width="100%">
 </p>
@@ -6,15 +14,6 @@
 
 <p align="center">
 Professional custom Snort detection rules for identifying common network attacks including reconnaissance, brute-force attempts, web application attacks, malware activity, and data exfiltration.
-</p>
-
-<p align="center">
-
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Snort](https://img.shields.io/badge/Snort-2.x-red.svg)
-![Platform](https://img.shields.io/badge/Linux-Ubuntu%20%7C%20Kali-blue.svg)
-![Status](https://img.shields.io/badge/Project-Active-success.svg)
-
 </p>
 
 ---
