@@ -1,29 +1,28 @@
-# Snort Logs
+# Logs
 *.log
-alert
-snort.log.*
 
-# Packet Captures
+# PCAP files
 *.pcap
-*.pcapng
 
-# Temporary Files
+# Temporary files
 *.tmp
+
+# Backups
 *.bak
-*.swp
-*~
+*.save
 
 # macOS
 .DS_Store
 
 # Windows
 Thumbs.db
+desktop.ini
 
-# Visual Studio Code
+# VS Code
 .vscode/
 
 # Python
 __pycache__/
 
-# Environment
-.env
+# Swap files
+*.swp
