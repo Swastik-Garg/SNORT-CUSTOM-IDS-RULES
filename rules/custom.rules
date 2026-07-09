@@ -188,18 +188,17 @@ alert http (
 )
 
 #
-# SQL Injection - OR 1=1
+# SQL Injection Test
 #
 
 alert http (
-    msg:"[WEB] SQL Injection - OR 1=1";
+    msg:"[WEB] SQL Injection Test";
     flow:to_server,established;
-    http_uri;
-    content:"or";
-    content:"1=1";
-    classtype:web-application-attack;
+    http_raw_uri;
+    content:"id=";
+    content:"1%3D1";
     sid:1000011;
-    rev:1;
+    rev:3;
 )
 
 #
@@ -237,11 +236,12 @@ alert http (
 alert http (
     msg:"[WEB] Cross Site Scripting";
     flow:to_server,established;
-    http_uri;
-    content:"<script",fast_pattern,nocase;
+    http_raw_uri;
+    content:"%3Cscript",fast_pattern,nocase;
     classtype:web-application-attack;
+    priority:2;
     sid:1000014;
-    rev:1;
+    rev:2;
 )
 
 #
