@@ -34,6 +34,18 @@ It is intended for:
 
 ---
 
+# 🛠 Technologies
+
+- Snort 3
+- Kali Linux
+- Git
+- GitHub
+- Bash
+- TCP/IP
+- IDS/IPS
+
+---
+
 # ✨ Features
 
 - TCP SYN Port Scan Detection
@@ -117,11 +129,11 @@ SNORT-CUSTOM-IDS-RULES
 
 # ⚙️ Requirements
 
-- Linux (Ubuntu / Kali)
-- Snort 2.9.x or later
-- Root Privileges
+- Snort 3.x
+- Kali Linux 2025+ (recommended)
+- Root privileges
 - libpcap
-- Configured Network Interface
+- Network interface in promiscuous mode (for live monitoring)
 
 ---
 
@@ -130,9 +142,9 @@ SNORT-CUSTOM-IDS-RULES
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/snort-custom-ids-rules.git
+git clone https://github.com/Swastik-Garg/SNORT-CUSTOM-IDS-RULES.git
 
-cd snort-custom-ids-rules
+cd SNORT-CUSTOM-IDS-RULES
 ```
 
 Copy the rule file
@@ -141,16 +153,16 @@ Copy the rule file
 sudo cp rules/custom.rules /etc/snort/rules/
 ```
 
-Open the Snort configuration
+Edit the Snort configuration:
 
 ```bash
-sudo nano /etc/snort/snort.conf
+sudo nano /etc/snort/snort.lua
 ```
 
-Include the custom rules
+Inside the `ips` section add:
 
-```conf
-include $RULE_PATH/custom.rules
+```lua
+include = "/etc/snort/rules/custom.rules"
 ```
 
 ---
@@ -158,7 +170,7 @@ include $RULE_PATH/custom.rules
 # ✅ Validate Configuration
 
 ```bash
-sudo snort -T -c /etc/snort/snort.conf
+sudo snort -T -c /etc/snort/snort.lua
 ```
 
 Expected Output
@@ -172,9 +184,10 @@ Snort successfully validated the configuration.
 # ▶️ Run Snort
 
 ```bash
-sudo snort -A console \
--c /etc/snort/snort.conf \
--i eth0
+sudo snort \
+-c /etc/snort/snort.lua \
+-i eth0 \
+-A alert_fast
 ```
 
 Replace **eth0** with your monitoring interface.
@@ -244,6 +257,19 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 
 ---
 
+# 📈 Project Statistics
+
+| Metric | Value |
+|---------|------:|
+| Snort Version | 3.x |
+| Custom Rules | Growing |
+| Attack Categories | 10+ |
+| Documentation Files | 4 |
+| Tested Platform | Kali Linux |
+| License | MIT |
+
+---
+
 # 📸 Demonstration
 
 ## Snort Startup
@@ -309,12 +335,12 @@ Complete documentation is available in the **docs** directory.
 
 # 🛠 Future Improvements
 
-- Snort 3 Support
-- Suricata Compatible Rules
-- Additional Malware Signatures
-- Threat Intelligence Integration
+- Additional Detection Rules
+- MITRE ATT&CK Mapping
+- CVE References
+- PCAP Test Suite
+- GitHub Actions Automated Testing
 - SIEM Integration Examples
-- Automated PCAP Testing
 - Community Rule Contributions
 
 ---
@@ -344,6 +370,21 @@ The author is not responsible for misuse of this project.
 This project is licensed under the MIT License.
 
 See the **LICENSE** file for details.
+
+---
+
+# 🎯 Learning Outcomes
+
+This project demonstrates practical skills in:
+
+- Network Intrusion Detection
+- Detection Engineering
+- Snort 3 Rule Development
+- Linux System Administration
+- Network Traffic Analysis
+- Cyber Threat Detection
+- Git & GitHub Version Control
+- Security Documentation
 
 ---
 
