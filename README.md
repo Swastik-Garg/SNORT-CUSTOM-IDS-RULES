@@ -4,7 +4,7 @@
 ![Snort](https://img.shields.io/badge/Snort-3.x-red)
 ![Platform](https://img.shields.io/badge/Platform-Kali%20Linux-blue)
 ![Status](https://img.shields.io/badge/Status-Tested-success)
-![Detection](https://img.shields.io/badge/Detection-31%20Rules-orange)
+![Detection](https://img.shields.io/badge/Detection-Custom%20Rules-orange)
 
 <p align="center">
   <img src="images/banner.png" alt="Snort Custom IDS IPS Rules Banner" width="100%">
