@@ -1,0 +1,43 @@
+name: Snort Project Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-repository:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Display Repository Structure
+        run: |
+          echo "Repository structure:"
+          ls -R
+
+      - name: Check Required Files
+        run: |
+          test -f README.md
+          test -f LICENSE
+          test -f rules/custom.rules
+          test -f configs/snort.conf.example
+          test -f docs/Installation.md
+          test -f docs/Configuration.md
+          test -f docs/Rule-Explanation.md
+          test -f docs/Testing.md
+
+      - name: Verify Shell Scripts
+        run: |
+          bash -n scripts/install.sh
+          bash -n scripts/validate.sh
+          bash -n scripts/run-snort.sh
+          bash -n scripts/check-environment.sh
+
+      - name: Success
+        run: echo "Repository validation completed successfully."

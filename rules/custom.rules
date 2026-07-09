@@ -1,0 +1,184 @@
+###############################################################
+# File        : custom.rules
+# Project     : Snort Custom IDS/IPS Rules
+# Author      : Swastik Garg
+# Description : Custom Snort detection rules for common
+#               reconnaissance, brute-force, web attacks,
+#               DNS attacks, malware activity, and data
+#               exfiltration.
+#
+# Version     : 1.0.0
+# License     : MIT
+###############################################################
+
+###############################################################
+# SECTION 1 - RECONNAISSANCE DETECTION
+###############################################################
+
+# Detect TCP SYN Port Scan
+alert tcp any any -> $HOME_NET any (
+    msg:"[SCAN] TCP SYN Port Scan Detected";
+    flags:S;
+    threshold:type both, track by_src, count 20, seconds 10;
+    classtype:attempted-recon;
+    sid:1000001;
+    rev:1;
+)
+
+# Detect Nmap XMAS Scan
+alert tcp any any -> $HOME_NET any (
+    msg:"[SCAN] Nmap XMAS Scan Detected";
+    flags:FPU;
+    classtype:attempted-recon;
+    sid:1000002;
+    rev:1;
+)
+
+###############################################################
+# SECTION 2 - ICMP ATTACKS
+###############################################################
+
+# Detect oversized ICMP packets
+alert icmp any any -> $HOME_NET any (
+    msg:"[ICMP] Large ICMP Packet Detected";
+    dsize:>1000;
+    classtype:attempted-dos;
+    sid:1000003;
+    rev:1;
+)
+
+###############################################################
+# SECTION 3 - WEB ATTACKS
+###############################################################
+
+# Detect access to /etc/passwd
+alert tcp any any -> $HOME_NET 80 (
+    msg:"[WEB] Directory Traversal - /etc/passwd";
+    flow:to_server,established;
+    content:"/etc/passwd";
+    http_uri;
+    nocase;
+    classtype:web-application-attack;
+    sid:1000004;
+    rev:1;
+)
+
+# Detect SQL Injection
+alert tcp any any -> $HOME_NET 80 (
+    msg:"[WEB] SQL Injection Attempt";
+    flow:to_server,established;
+    content:"' OR 1=1--";
+    http_uri;
+    nocase;
+    classtype:web-application-attack;
+    sid:1000005;
+    rev:1;
+)
+
+# Detect Cross-Site Scripting
+alert tcp any any -> $HOME_NET 80 (
+    msg:"[WEB] Cross-Site Scripting Attempt";
+    flow:to_server,established;
+    content:"<script>";
+    http_uri;
+    nocase;
+    classtype:web-application-attack;
+    sid:1000006;
+    rev:1;
+)
+
+###############################################################
+# SECTION 4 - AUTHENTICATION ATTACKS
+###############################################################
+
+# FTP Brute Force
+alert tcp any any -> $HOME_NET 21 (
+    msg:"[AUTH] FTP Brute Force";
+    threshold:type both, track by_src, count 5, seconds 60;
+    sid:1000007;
+    rev:1;
+)
+
+# SSH Access Monitoring
+alert tcp any any -> $HOME_NET 22 (
+    msg:"[AUTH] SSH Connection";
+    sid:1000008;
+    rev:1;
+)
+
+###############################################################
+# SECTION 5 - SMB
+###############################################################
+
+alert tcp any any -> $HOME_NET 445 (
+    msg:"[SMB] SMB Connection";
+    sid:1000009;
+    rev:1;
+)
+
+###############################################################
+# SECTION 6 - DNS
+###############################################################
+
+# Large DNS Query
+alert udp any any -> $HOME_NET 53 (
+    msg:"[DNS] Possible DNS Tunneling";
+    dsize:>300;
+    sid:1000010;
+    rev:1;
+)
+
+###############################################################
+# SECTION 7 - MALWARE
+###############################################################
+
+# Reverse Shell Indicator
+alert tcp any any -> $HOME_NET any (
+    msg:"[MALWARE] Possible Reverse Shell";
+    content:"/bin/sh";
+    nocase;
+    sid:1000011;
+    rev:1;
+)
+
+###############################################################
+# SECTION 8 - DATA EXFILTRATION
+###############################################################
+
+alert tcp any any -> $HOME_NET 80 (
+    msg:"[DATA] Large HTTP POST Request";
+    flow:to_server,established;
+    content:"POST";
+    http_method;
+    dsize:>5000;
+    sid:1000012;
+    rev:1;
+)
+
+###############################################################
+# SECTION 9 - OPTIONAL IPS RULES
+###############################################################
+
+reject tcp any any -> $HOME_NET 21 (
+    msg:"[IPS] FTP Connection Blocked";
+    sid:1000013;
+    rev:1;
+)
+
+reject tcp any any -> $HOME_NET 23 (
+    msg:"[IPS] Telnet Connection Blocked";
+    sid:1000014;
+    rev:1;
+)
+
+reject tcp any any -> $HOME_NET 22 (
+    msg:"[IPS] SSH Connection Blocked";
+    sid:1000015;
+    rev:1;
+)
+
+reject tcp any any -> $HOME_NET 3389 (
+    msg:"[IPS] RDP Connection Blocked";
+    sid:1000016;
+    rev:1;
+)
