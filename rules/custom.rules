@@ -1,184 +1,830 @@
-###############################################################
+###############################################################################
 # File        : custom.rules
-# Project     : Snort Custom IDS/IPS Rules
+# Project     : Snort 3 Detection Engineering Rule Pack
 # Author      : Swastik Garg
-# Description : Custom Snort detection rules for common
-#               reconnaissance, brute-force, web attacks,
-#               DNS attacks, malware activity, and data
-#               exfiltration.
-#
-# Version     : 1.0.0
+# Version     : 2.0.0
 # License     : MIT
-###############################################################
+#
+# Description:
+# Custom Snort 3 IDS/IPS rules developed for cybersecurity labs,
+# SOC monitoring, threat hunting, and network intrusion detection.
+#
+# Repository:
+# https://github.com/Swastik-Garg/SNORT-CUSTOM-IDS-RULES
+###############################################################################
 
-###############################################################
-# SECTION 1 - RECONNAISSANCE DETECTION
-###############################################################
+###############################################################################
+# SECTION 1 — RECONNAISSANCE DETECTION
+###############################################################################
 
-# Detect TCP SYN Port Scan
+########################################
+# TCP SYN Scan
+########################################
+
 alert tcp any any -> $HOME_NET any (
-    msg:"[SCAN] TCP SYN Port Scan Detected";
+    msg:"[RECON] TCP SYN Port Scan Detected";
+    flow:stateless;
     flags:S;
-    threshold:type both, track by_src, count 20, seconds 10;
+    detection_filter:track by_src,count 20,seconds 10;
     classtype:attempted-recon;
+    priority:2;
+    metadata:
+        service tcp,
+        attack_target Server,
+        deployment Perimeter,
+        confidence High,
+        mitre_tactic Reconnaissance,
+        mitre_technique T1046;
     sid:1000001;
-    rev:1;
+    rev:2;
 )
 
-# Detect Nmap XMAS Scan
+########################################
+# TCP FIN Scan
+########################################
+
 alert tcp any any -> $HOME_NET any (
-    msg:"[SCAN] Nmap XMAS Scan Detected";
+    msg:"[RECON] TCP FIN Scan Detected";
+    flow:stateless;
+    flags:F;
+    classtype:attempted-recon;
+    priority:2;
+    metadata:
+        mitre_tactic Reconnaissance,
+        mitre_technique T1046;
+    sid:1000002;
+    rev:2;
+)
+
+########################################
+# TCP NULL Scan
+########################################
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[RECON] TCP NULL Scan Detected";
+    flow:stateless;
+    flags:0;
+    classtype:attempted-recon;
+    priority:2;
+    metadata:
+        mitre_tactic Reconnaissance,
+        mitre_technique T1046;
+    sid:1000003;
+    rev:2;
+)
+
+########################################
+# TCP XMAS Scan
+########################################
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[RECON] TCP XMAS Scan Detected";
+    flow:stateless;
     flags:FPU;
     classtype:attempted-recon;
-    sid:1000002;
-    rev:1;
+    priority:2;
+    metadata:
+        mitre_tactic Reconnaissance,
+        mitre_technique T1046;
+    sid:1000004;
+    rev:2;
 )
 
-###############################################################
-# SECTION 2 - ICMP ATTACKS
-###############################################################
+########################################
+# UDP Port Scan
+########################################
 
-# Detect oversized ICMP packets
+alert udp any any -> $HOME_NET any (
+    msg:"[RECON] UDP Port Scan Activity";
+    detection_filter:track by_src,count 20,seconds 15;
+    classtype:attempted-recon;
+    priority:2;
+    metadata:
+        mitre_tactic Reconnaissance,
+        mitre_technique T1046;
+    sid:1000005;
+    rev:2;
+)
+
+###############################################################################
+# END OF SECTION 1 — RECONNAISSANCE DETECTION
+###############################################################################
+
+###############################################################################
+# SECTION 2 — ICMP DETECTION
+###############################################################################
+
+########################################
+# Large ICMP Packet
+########################################
+
 alert icmp any any -> $HOME_NET any (
-    msg:"[ICMP] Large ICMP Packet Detected";
+    msg:"[ICMP] Oversized ICMP Packet";
     dsize:>1000;
     classtype:attempted-dos;
-    sid:1000003;
-    rev:1;
-)
-
-###############################################################
-# SECTION 3 - WEB ATTACKS
-###############################################################
-
-# Detect access to /etc/passwd
-alert tcp any any -> $HOME_NET 80 (
-    msg:"[WEB] Directory Traversal - /etc/passwd";
-    flow:to_server,established;
-    content:"/etc/passwd";
-    http_uri;
-    nocase;
-    classtype:web-application-attack;
-    sid:1000004;
-    rev:1;
-)
-
-# Detect SQL Injection
-alert tcp any any -> $HOME_NET 80 (
-    msg:"[WEB] SQL Injection Attempt";
-    flow:to_server,established;
-    content:"' OR 1=1--";
-    http_uri;
-    nocase;
-    classtype:web-application-attack;
-    sid:1000005;
-    rev:1;
-)
-
-# Detect Cross-Site Scripting
-alert tcp any any -> $HOME_NET 80 (
-    msg:"[WEB] Cross-Site Scripting Attempt";
-    flow:to_server,established;
-    content:"<script>";
-    http_uri;
-    nocase;
-    classtype:web-application-attack;
+    priority:2;
+    metadata:
+        mitre_tactic Impact,
+        mitre_technique T1498;
     sid:1000006;
-    rev:1;
+    rev:2;
 )
 
-###############################################################
-# SECTION 4 - AUTHENTICATION ATTACKS
-###############################################################
+########################################
+# ICMP Echo Flood
+########################################
 
-# FTP Brute Force
-alert tcp any any -> $HOME_NET 21 (
-    msg:"[AUTH] FTP Brute Force";
-    threshold:type both, track by_src, count 5, seconds 60;
+alert icmp any any -> $HOME_NET any (
+    msg:"[ICMP] ICMP Echo Flood";
+    itype:8;
+    detection_filter:track by_src,count 100,seconds 5;
+    classtype:attempted-dos;
+    priority:1;
+    metadata:
+        mitre_tactic Impact,
+        mitre_technique T1498;
     sid:1000007;
-    rev:1;
+    rev:2;
 )
 
-# SSH Access Monitoring
-alert tcp any any -> $HOME_NET 22 (
-    msg:"[AUTH] SSH Connection";
+########################################
+# ICMP Destination Unreachable Flood
+########################################
+
+alert icmp any any -> $HOME_NET any (
+    msg:"[ICMP] Destination Unreachable Flood";
+    itype:3;
+    detection_filter:track by_src,count 50,seconds 10;
+    classtype:misc-activity;
+    priority:3;
+    metadata:
+        mitre_tactic Discovery;
     sid:1000008;
-    rev:1;
+    rev:2;
 )
 
-###############################################################
-# SECTION 5 - SMB
-###############################################################
+###############################################################################
+# END OF SECTION 2 — ICMP DETECTION
+###############################################################################
 
-alert tcp any any -> $HOME_NET 445 (
-    msg:"[SMB] SMB Connection";
-    sid:1000009;
-    rev:1;
-)
 
-###############################################################
-# SECTION 6 - DNS
-###############################################################
+###############################################################################
+# SECTION 3 — WEB APPLICATION ATTACKS
+###############################################################################
 
-# Large DNS Query
-alert udp any any -> $HOME_NET 53 (
-    msg:"[DNS] Possible DNS Tunneling";
-    dsize:>300;
+#
+# SQL Injection - UNION SELECT
+#
+
+alert http (
+    msg:"[WEB] SQL Injection - UNION SELECT";
+    flow:to_server,established;
+    http_uri;
+    content:"union",fast_pattern,nocase;
+    content:"select",nocase;
+    classtype:web-application-attack;
     sid:1000010;
     rev:1;
 )
 
-###############################################################
-# SECTION 7 - MALWARE
-###############################################################
+#
+# SQL Injection - OR 1=1
+#
 
-# Reverse Shell Indicator
-alert tcp any any -> $HOME_NET any (
-    msg:"[MALWARE] Possible Reverse Shell";
-    content:"/bin/sh";
-    nocase;
+alert http (
+    msg:"[WEB] SQL Injection - OR 1=1";
+    flow:to_server,established;
+    http_uri;
+    content:"or";
+    content:"1=1";
+    classtype:web-application-attack;
     sid:1000011;
     rev:1;
 )
 
-###############################################################
-# SECTION 8 - DATA EXFILTRATION
-###############################################################
+#
+# Directory Traversal
+#
 
-alert tcp any any -> $HOME_NET 80 (
-    msg:"[DATA] Large HTTP POST Request";
+alert http (
+    msg:"[WEB] Directory Traversal";
     flow:to_server,established;
-    content:"POST";
-    http_method;
-    dsize:>5000;
+    http_raw_uri;
+    content:"../";
+    classtype:web-application-attack;
     sid:1000012;
     rev:1;
 )
 
-###############################################################
-# SECTION 9 - OPTIONAL IPS RULES
-###############################################################
+#
+# Access to /etc/passwd
+#
 
-reject tcp any any -> $HOME_NET 21 (
-    msg:"[IPS] FTP Connection Blocked";
+alert http (
+    msg:"[WEB] Access Attempt - /etc/passwd";
+    flow:to_server,established;
+    http_uri;
+    content:"/etc/passwd",fast_pattern;
+    classtype:attempted-recon;
     sid:1000013;
     rev:1;
 )
 
-reject tcp any any -> $HOME_NET 23 (
-    msg:"[IPS] Telnet Connection Blocked";
+#
+# Cross Site Scripting
+#
+
+alert http (
+    msg:"[WEB] Cross Site Scripting";
+    flow:to_server,established;
+    http_uri;
+    content:"<script",fast_pattern,nocase;
+    classtype:web-application-attack;
     sid:1000014;
     rev:1;
 )
 
-reject tcp any any -> $HOME_NET 22 (
-    msg:"[IPS] SSH Connection Blocked";
+#
+# Command Injection
+#
+
+alert http (
+    msg:"[WEB] Command Injection";
+    flow:to_server,established;
+    http_uri;
+    pcre:"/(\;|\|\||&&)\s*(cat|id|whoami|uname|pwd)/i";
+    classtype:web-application-attack;
     sid:1000015;
     rev:1;
 )
 
-reject tcp any any -> $HOME_NET 3389 (
-    msg:"[IPS] RDP Connection Blocked";
+#
+# Suspicious PowerShell
+#
+
+alert http (
+    msg:"[WEB] PowerShell Download";
+    flow:to_server,established;
+    http_uri;
+    content:"powershell",fast_pattern,nocase;
+    classtype:trojan-activity;
     sid:1000016;
     rev:1;
 )
+
+#
+# cmd.exe
+#
+
+alert http (
+    msg:"[WEB] cmd.exe Request";
+    flow:to_server,established;
+    http_uri;
+    content:"cmd.exe",fast_pattern,nocase;
+    classtype:web-application-attack;
+    sid:1000017;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 3 — WEB APPLICATION ATTACKS
+###############################################################################
+
+###############################################################################
+# SECTION 4 — AUTHENTICATION ATTACK DETECTION
+###############################################################################
+
+#
+# SSH Brute Force
+#
+
+alert tcp any any -> $HOME_NET 22 (
+    msg:"[AUTH] Possible SSH Brute Force";
+    flow:to_server,established;
+    detection_filter:track by_src,count 8,seconds 60;
+    classtype:attempted-admin;
+    priority:1;
+    metadata:
+        service ssh,
+        mitre_tactic Credential_Access,
+        mitre_technique T1110;
+    sid:1000020;
+    rev:1;
+)
+
+#
+# FTP Login Attempt
+#
+
+alert tcp any any -> $HOME_NET 21 (
+    msg:"[AUTH] FTP Login Attempt";
+    flow:to_server,established;
+    content:"USER";
+    classtype:protocol-command-decode;
+    priority:3;
+    metadata:
+        service ftp;
+    sid:1000021;
+    rev:1;
+)
+
+#
+# FTP Brute Force
+#
+
+alert tcp any any -> $HOME_NET 21 (
+    msg:"[AUTH] Possible FTP Brute Force";
+    flow:to_server,established;
+    detection_filter:track by_src,count 10,seconds 60;
+    classtype:attempted-admin;
+    priority:1;
+    metadata:
+        service ftp,
+        mitre_tactic Credential_Access,
+        mitre_technique T1110;
+    sid:1000022;
+    rev:1;
+)
+
+#
+# Telnet Login
+#
+
+alert tcp any any -> $HOME_NET 23 (
+    msg:"[AUTH] Telnet Connection";
+    flow:to_server,established;
+    classtype:misc-activity;
+    priority:2;
+    metadata:
+        service telnet;
+    sid:1000023;
+    rev:1;
+)
+
+#
+# RDP Connection
+#
+
+alert tcp any any -> $HOME_NET 3389 (
+    msg:"[AUTH] Remote Desktop Connection";
+    flow:to_server,established;
+    classtype:misc-activity;
+    priority:2;
+    metadata:
+        service rdp;
+    sid:1000024;
+    rev:1;
+)
+
+#
+# SMB Login
+#
+
+alert tcp any any -> $HOME_NET 445 (
+    msg:"[AUTH] SMB Login Activity";
+    flow:to_server,established;
+    classtype:misc-activity;
+    priority:2;
+    metadata:
+        service smb;
+    sid:1000025;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 4 — AUTHENTICATION ATTACK DETECTION
+###############################################################################
+
+###############################################################################
+# SECTION 5 — DNS DETECTION
+###############################################################################
+
+#
+# Suspicious Long DNS Query
+#
+
+alert udp any any -> any 53 (
+    msg:"[DNS] Suspicious Long DNS Query";
+    dsize:>200;
+    classtype:bad-unknown;
+    priority:2;
+    metadata:
+        service dns,
+        mitre_tactic Command_And_Control,
+        mitre_technique T1071.004;
+    sid:1000030;
+    rev:1;
+)
+
+#
+# High Rate DNS Requests
+#
+
+alert udp any any -> any 53 (
+    msg:"[DNS] Possible DNS Tunneling";
+    detection_filter:track by_src,count 100,seconds 30;
+    classtype:bad-unknown;
+    priority:1;
+    metadata:
+        service dns,
+        mitre_tactic Command_And_Control,
+        mitre_technique T1071.004;
+    sid:1000031;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 5 — DNS DETECTION
+###############################################################################
+
+###############################################################################
+# SECTION 6 — SMB DETECTION
+###############################################################################
+
+#
+# SMB Enumeration
+#
+
+alert tcp any any -> $HOME_NET 445 (
+    msg:"[SMB] SMB Enumeration Activity";
+    flow:to_server,established;
+    classtype:attempted-recon;
+    priority:2;
+    metadata:
+        service smb,
+        mitre_tactic Discovery,
+        mitre_technique T1135;
+    sid:1000032;
+    rev:1;
+)
+
+#
+# SMB Admin Share Access
+#
+
+alert tcp any any -> $HOME_NET 445 (
+    msg:"[SMB] Administrative Share Access";
+    flow:to_server,established;
+    classtype:attempted-admin;
+    priority:1;
+    metadata:
+        service smb,
+        mitre_tactic Lateral_Movement,
+        mitre_technique T1021.002;
+    sid:1000033;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 6 — SMB DETECTION
+###############################################################################
+
+
+###############################################################################
+# SECTION 7 — DATA EXFILTRATION
+###############################################################################
+
+#
+# Large HTTP Upload
+#
+
+alert http (
+    msg:"[EXFIL] Large HTTP Upload";
+    flow:to_server,established;
+    dsize:>5000;
+    classtype:data-theft;
+    priority:1;
+    metadata:
+        service http,
+        mitre_tactic Exfiltration,
+        mitre_technique T1048;
+    sid:1000034;
+    rev:1;
+)
+
+#
+# Large FTP Transfer
+#
+
+alert tcp any any -> any 21 (
+    msg:"[EXFIL] Large FTP Transfer";
+    flow:to_server,established;
+    dsize:>5000;
+    classtype:data-theft;
+    priority:1;
+    metadata:
+        service ftp,
+        mitre_tactic Exfiltration,
+        mitre_technique T1048;
+    sid:1000035;
+    rev:1;
+)
+
+#
+# Large ICMP Payload
+#
+
+alert icmp any any -> any any (
+    msg:"[EXFIL] Large ICMP Payload";
+    dsize:>1200;
+    classtype:data-theft;
+    priority:2;
+    metadata:
+        mitre_tactic Exfiltration,
+        mitre_technique T1048;
+    sid:1000036;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 7 — DATA EXFILTRATION
+###############################################################################
+
+
+###############################################################################
+# SECTION 8 — MALWARE & COMMAND-AND-CONTROL DETECTION
+###############################################################################
+
+#
+# Suspicious PowerShell Encoded Command
+#
+
+alert http (
+    msg:"[MALWARE] PowerShell Encoded Command";
+    flow:to_server,established;
+    http_uri;
+    content:"-enc",fast_pattern,nocase;
+    classtype:trojan-activity;
+    priority:1;
+    metadata:
+        service http,
+        mitre_tactic Execution,
+        mitre_technique T1059.001;
+    sid:1000040;
+    rev:1;
+)
+
+#
+# Netcat Download
+#
+
+alert http (
+    msg:"[MALWARE] Netcat Download";
+    flow:to_server,established;
+    http_uri;
+    content:"nc.exe",fast_pattern,nocase;
+    classtype:trojan-activity;
+    priority:1;
+    metadata:
+        service http,
+        mitre_tactic Command_And_Control,
+        mitre_technique T1105;
+    sid:1000041;
+    rev:1;
+)
+
+#
+# Mimikatz Download
+#
+
+alert http (
+    msg:"[MALWARE] Mimikatz Download";
+    flow:to_server,established;
+    http_uri;
+    content:"mimikatz",fast_pattern,nocase;
+    classtype:trojan-activity;
+    priority:1;
+    metadata:
+        service http,
+        mitre_tactic Credential_Access,
+        mitre_technique T1003;
+    sid:1000042;
+    rev:1;
+)
+
+#
+# Reverse Shell Indicator
+#
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[MALWARE] Possible Reverse Shell";
+    flow:to_client,established;
+    content:"/bin/sh";
+    classtype:shellcode-detect;
+    priority:1;
+    metadata:
+        mitre_tactic Command_And_Control,
+        mitre_technique T1059.004;
+    sid:1000043;
+    rev:1;
+)
+
+#
+# Suspicious User-Agent
+#
+
+alert http (
+    msg:"[MALWARE] Suspicious User-Agent";
+    flow:to_server,established;
+    http_header;
+    content:"curl/",fast_pattern,nocase;
+    classtype:bad-unknown;
+    priority:2;
+    metadata:
+        service http,
+        mitre_tactic Command_And_Control,
+        mitre_technique T1071.001;
+    sid:1000044;
+    rev:1;
+)
+
+#
+# Wget User-Agent
+#
+
+alert http (
+    msg:"[MALWARE] Wget User-Agent";
+    flow:to_server,established;
+    http_header;
+    content:"Wget",fast_pattern,nocase;
+    classtype:bad-unknown;
+    priority:2;
+    metadata:
+        service http,
+        mitre_tactic Command_And_Control,
+        mitre_technique T1071.001;
+    sid:1000045;
+    rev:1;
+)
+
+#
+# Meterpreter Indicator
+#
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[MALWARE] Possible Meterpreter Traffic";
+    flow:established;
+    content:"metsrv";
+    classtype:trojan-activity;
+    priority:1;
+    metadata:
+        mitre_tactic Command_And_Control,
+        mitre_technique T1219;
+    sid:1000046;
+    rev:1;
+)
+
+#
+# Generic Base64 Payload
+#
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[MALWARE] Suspicious Base64 Payload";
+    flow:established;
+    pcre:"/([A-Za-z0-9+\/]{150,}={0,2})/";
+    classtype:bad-unknown;
+    priority:2;
+    metadata:
+        mitre_tactic Defense_Evasion;
+    sid:1000047;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 8 — MALWARE & COMMAND-AND-CONTROL DETECTION
+###############################################################################
+
+###############################################################################
+# SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
+###############################################################################
+
+#
+# Executable Download (.exe)
+#
+
+alert http (
+    msg:"[POLICY] Executable File Download";
+    flow:to_client,established;
+    file_data;
+    content:"MZ",fast_pattern;
+    classtype:policy-violation;
+    priority:2;
+    metadata:
+        service http,
+        policy Security,
+        mitre_tactic Initial_Access;
+    sid:1000050;
+    rev:1;
+)
+
+#
+# ZIP Archive Download
+#
+
+alert http (
+    msg:"[POLICY] ZIP Archive Download";
+    flow:to_client,established;
+    file_data;
+    content:"PK|03 04|";
+    classtype:policy-violation;
+    priority:3;
+    metadata:
+        service http;
+    sid:1000051;
+    rev:1;
+)
+
+#
+# PDF Download
+#
+
+alert http (
+    msg:"[POLICY] PDF File Download";
+    flow:to_client,established;
+    file_data;
+    content:"%PDF";
+    classtype:policy-violation;
+    priority:3;
+    metadata:
+        service http;
+    sid:1000052;
+    rev:1;
+)
+
+#
+# PE File over SMB
+#
+
+alert tcp any any -> $HOME_NET 445 (
+    msg:"[SMB] Windows Executable Transfer";
+    flow:established;
+    content:"MZ";
+    classtype:policy-violation;
+    priority:2;
+    metadata:
+        service smb;
+    sid:1000053;
+    rev:1;
+)
+
+#
+# Generic Large File Transfer
+#
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[EXFIL] Large File Transfer";
+    flow:established;
+    dsize:>10000;
+    classtype:data-theft;
+    priority:2;
+    metadata:
+        mitre_tactic Exfiltration,
+        mitre_technique T1048;
+    sid:1000054;
+    rev:1;
+)
+
+#
+# Suspicious Binary Transfer
+#
+
+alert tcp any any -> $HOME_NET any (
+    msg:"[POLICY] Suspicious Binary Payload";
+    flow:established;
+    content:"This program cannot be run in DOS mode";
+    classtype:policy-violation;
+    priority:2;
+    sid:1000055;
+    rev:1;
+)
+
+###############################################################################
+# END OF SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
+###############################################################################
+
+###############################################################################
+# END OF FILE
+#
+# Project  : Snort 3 Detection Engineering Rule Pack
+# Version  : 2.0.0
+# Author   : Swastik Garg
+#
+# Rule Categories
+# ----------------
+# ✓ Reconnaissance
+# ✓ ICMP Attacks
+# ✓ Web Application Attacks
+# ✓ Authentication Attacks
+# ✓ DNS Detection
+# ✓ SMB Detection
+# ✓ Data Exfiltration
+# ✓ Malware & Command-and-Control
+# ✓ Policy Violations
+#
+# Total Custom Rules : 31
+#
+# Repository:
+# https://github.com/Swastik-Garg/SNORT-CUSTOM-IDS-RULES
+###############################################################################
+# END OF SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
+###############################################################################
