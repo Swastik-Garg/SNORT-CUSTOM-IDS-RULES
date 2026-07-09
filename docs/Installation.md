@@ -1,50 +1,50 @@
-# Snort Installation Guide
+# Snort 3 Installation Guide
 
-This guide explains how to install Snort, configure the custom rule set, and verify that everything is working correctly.
+This guide explains how to install Snort 3 on Kali Linux and prepare the environment for using the custom IDS/IPS rule set included in this repository.
 
 ---
 
-# Prerequisites
+# System Requirements
 
-Before installing Snort, ensure your system meets the following requirements:
-
-- Linux (Ubuntu or Kali Linux recommended)
+- Kali Linux (Recommended)
+- Ubuntu 22.04+
 - Root or sudo privileges
 - Internet connection
-- Git
-- GCC Compiler
-- libpcap
-- DAQ (Data Acquisition Library)
+- libpcap support
 
 ---
 
-# Step 1: Clone the Repository
+# Update the System
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/snort-custom-ids-rules.git
-
-cd snort-custom-ids-rules
+sudo apt update
+sudo apt upgrade -y
 ```
-
-Replace `YOUR_USERNAME` with your GitHub username.
 
 ---
 
-# Step 2: Install Snort
-
-## Ubuntu
+# Install Required Packages
 
 ```bash
-sudo apt update
-sudo apt install snort -y
+sudo apt install -y \
+build-essential \
+cmake \
+libpcap-dev \
+libpcre3-dev \
+libdumbnet-dev \
+bison \
+flex \
+zlib1g-dev \
+liblzma-dev \
+openssl \
+libssl-dev \
+pkg-config \
+git
 ```
 
-## Kali Linux
+---
 
-```bash
-sudo apt update
-sudo apt install snort -y
-```
+# Install Snort 3
 
 Verify the installation:
 
@@ -52,48 +52,18 @@ Verify the installation:
 snort -V
 ```
 
-Expected output:
+Example output:
 
 ```
-Version 2.9.x
-```
-
----
-
-# Step 3: Copy the Custom Rule File
-
-Copy the custom rules into Snort's rule directory.
-
-```bash
-sudo cp rules/custom.rules /etc/snort/rules/
+Snort++ 3.x.x.x
 ```
 
 ---
 
-# Step 4: Configure Snort
-
-Open the Snort configuration file.
+# Verify Configuration
 
 ```bash
-sudo nano /etc/snort/snort.conf
-```
-
-Locate the rule include section and add:
-
-```conf
-include $RULE_PATH/custom.rules
-```
-
-Save the file.
-
----
-
-# Step 5: Validate the Configuration
-
-Run:
-
-```bash
-sudo snort -T -c /etc/snort/snort.conf
+sudo snort -T -c /etc/snort/snort.lua
 ```
 
 Expected output:
@@ -104,136 +74,87 @@ Snort successfully validated the configuration.
 
 ---
 
-# Step 6: Run Snort
+# Install Custom Rules
 
-Start Snort in console mode.
+Clone the repository:
 
 ```bash
-sudo snort -A console \
--c /etc/snort/snort.conf \
--i eth0
+git clone https://github.com/Swastik-Garg/SNORT-CUSTOM-IDS-RULES.git
 ```
 
-Replace **eth0** with your network interface.
-
-To list available interfaces:
+Copy the rules:
 
 ```bash
-ip addr
+sudo cp rules/custom.rules /etc/snort/rules/
 ```
 
 ---
 
-# Optional: Using the Helper Scripts
+# Update snort.lua
 
-This repository includes helper scripts inside the `scripts/` directory to simplify installation and validation.
+Include the custom rules:
 
-## Option 1 (Recommended)
-
-Run the scripts directly using Bash:
-
-```bash
-bash scripts/install.sh
-bash scripts/validate.sh
-bash scripts/run-snort.sh eth0
-```
-
-This method works even if the scripts are not marked as executable.
-
----
-
-## Option 2
-
-Make the scripts executable and run them directly.
-
-```bash
-chmod +x scripts/install.sh
-chmod +x scripts/validate.sh
-chmod +x scripts/run-snort.sh
-```
-
-Now execute them:
-
-```bash
-./scripts/install.sh
-./scripts/validate.sh
-./scripts/run-snort.sh eth0
+```lua
+ips =
+{
+    include = "/etc/snort/rules/custom.rules"
+}
 ```
 
 ---
 
-# Verify the Installation
-
-Generate some test traffic, for example:
+# Validate Again
 
 ```bash
-nmap -sS <Target-IP>
+sudo snort -T -c /etc/snort/snort.lua
 ```
 
-If everything is configured correctly, Snort should generate alerts according to the rules defined in `custom.rules`.
+The configuration should validate successfully before running Snort.
+
+---
+
+# Run Snort
+
+```bash
+sudo snort -c /etc/snort/snort.lua \
+-i eth0 \
+-A alert_fast
+```
+
+Replace **eth0** with your monitoring interface.
 
 ---
 
 # Troubleshooting
 
-### Snort command not found
+## Configuration Errors
 
-Verify that Snort is installed:
+Run:
 
 ```bash
-snort -V
+sudo snort -T -c /etc/snort/snort.lua
 ```
 
-If not installed:
+Fix any reported syntax errors before continuing.
+
+## Interface Check
 
 ```bash
-sudo apt install snort
+ip a
+```
+
+Verify the correct interface is selected.
+
+## Rule Validation
+
+Ensure the custom rule file is located at:
+
+```
+/etc/snort/rules/custom.rules
 ```
 
 ---
 
-### Rule file not found
+# Next Step
 
-Ensure that `custom.rules` exists in:
-
-```
-/etc/snort/rules/
-```
-
----
-
-### Permission denied
-
-Run commands with:
-
-```bash
-sudo
-```
-
-or execute the helper scripts using:
-
-```bash
-bash scripts/install.sh
-```
-
----
-
-### Invalid configuration
-
-Validate the configuration:
-
-```bash
-sudo snort -T -c /etc/snort/snort.conf
-```
-
-Correct any reported errors before starting Snort.
-
----
-
-# Next Steps
-
-After completing the installation:
-
-- Review `docs/Configuration.md` to understand Snort configuration.
-- Read `docs/Rule-Explanation.md` to learn how each rule works.
-- Follow `docs/Testing.md` to test the rule set using common security tools.
+Continue with the Configuration Guide.

@@ -1,123 +1,182 @@
-# Snort Configuration Guide
+# Snort 3 Configuration Guide
 
-This document explains the basic configuration options required for running the custom Snort rules.
+This guide explains how to configure Snort 3 to use the custom detection rules provided in this repository.
 
 ---
 
-# HOME_NET
+# Directory Structure
 
-Defines the protected network.
-
-Example:
-
-```conf
-ipvar HOME_NET 192.168.1.0/24
-```
-
-Example:
+The default Snort directories used in this project are:
 
 ```
-192.168.1.0 - 192.168.1.255
+/etc/snort/
+├── snort.lua
+├── rules/
+│   └── custom.rules
+├── builtin_rules/
+└── so_rules/
 ```
 
 ---
 
-# EXTERNAL_NET
+# Copy the Rule File
 
-Defines traffic originating outside the protected network.
-
-```conf
-ipvar EXTERNAL_NET any
-```
-
----
-
-# RULE_PATH
-
-Specifies where Snort loads rule files.
-
-```conf
-var RULE_PATH /etc/snort/rules
-```
-
----
-
-# Include Custom Rules
-
-```conf
-include $RULE_PATH/custom.rules
-```
-
----
-
-# Output Plugins
-
-Console Output
-
-```conf
-output alert_fast: stdout
-```
-
-Log Output
-
-```conf
-output log_tcpdump: snort.log
-```
-
----
-
-# Network Interface
-
-View interfaces:
+Copy the repository rule file into the Snort rules directory.
 
 ```bash
-ip addr
+sudo cp rules/custom.rules /etc/snort/rules/
 ```
 
+---
+
+# Edit snort.lua
+
+Open the configuration file.
+
+```bash
+sudo nano /etc/snort/snort.lua
+```
+
+Locate the IPS configuration section and include the custom rule file.
+
+```lua
+ips =
+{
+    include = "/etc/snort/rules/custom.rules"
+}
+```
+
+Save the file.
+
+---
+
+# Verify Network Variables
+
+Ensure the HOME_NET variable matches your environment.
+
 Example:
+
+```lua
+HOME_NET = '192.168.17.0/24'
+```
+
+If monitoring another network, update it accordingly.
+
+---
+
+# Select the Monitoring Interface
+
+List available interfaces.
+
+```bash
+ip a
+```
+
+Example output:
 
 ```
 eth0
-ens33
-enp0s3
+eth1
+lo
 ```
+
+Choose the interface connected to the monitored network.
 
 ---
 
-# Validate Configuration
+# Validate the Configuration
+
+Always validate before starting Snort.
 
 ```bash
-sudo snort -T -c /etc/snort/snort.conf
+sudo snort -T -c /etc/snort/snort.lua
+```
+
+Expected output:
+
+```
+Snort successfully validated the configuration.
 ```
 
 ---
 
-# Common Issues
+# Run Snort
 
-## Rule Not Found
+Start Snort in IDS mode.
+
+```bash
+sudo snort \
+-c /etc/snort/snort.lua \
+-i eth0 \
+-A alert_fast
+```
+
+Replace **eth0** with your network interface.
+
+---
+
+# Verify Alerts
+
+Generate test traffic, such as:
+
+- Nmap SYN Scan
+- FTP Brute Force
+- ICMP Flood
+
+Snort should display alerts similar to:
+
+```
+[RECON] TCP SYN Port Scan Detected
+[AUTH] Possible FTP Brute Force
+```
+
+---
+
+# Common Problems
+
+## Configuration Validation Failed
+
+Run:
+
+```bash
+sudo snort -T -c /etc/snort/snort.lua
+```
+
+Correct any syntax errors before running Snort.
+
+---
+
+## No Alerts Generated
 
 Check:
 
-```
-RULE_PATH
+- Correct network interface
+- HOME_NET configuration
+- Rule file path
+- Traffic reaches the monitored interface
+
+---
+
+## Rules Not Loading
+
+Verify the rule file exists.
+
+```bash
+ls -l /etc/snort/rules/custom.rules
 ```
 
 ---
 
-## Permission Denied
+# Best Practices
 
-Run Snort using:
-
-```bash
-sudo
-```
+- Validate the configuration after every rule change.
+- Keep custom rules in a separate file.
+- Test new signatures in a lab environment.
+- Maintain unique SID values.
+- Document every rule revision.
 
 ---
 
-## Invalid Rule
+# Next Step
 
-Validate:
-
-```bash
-sudo snort -T -c /etc/snort/snort.conf
-```
+Continue with **Rule-Explanation.md** to understand each detection rule.
