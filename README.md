@@ -7,7 +7,7 @@
 ![Detection](https://img.shields.io/badge/Detection-Custom%20Rules-orange)
 
 <p align="center">
-  <img src="images/banner2.jpg" alt="Snort Custom IDS IPS Rules Banner" width="100%">
+  <img src="images/banner.png" alt="Snort Custom IDS IPS Rules Banner" width="100%">
 </p>
 
 <h1 align="center">🛡️ Snort Custom IDS/IPS Rules</h1>
@@ -71,7 +71,7 @@ It is intended for:
 # 🏗️ Network Architecture
 
 <p align="center">
-<img src="images/arch2.jpg" width="900">
+<img src="images/architecture.png" width="900">
 </p>
 
 Traffic is inspected by the Snort Detection Engine using the custom rule set. Matching packets generate alerts that can be reviewed by security analysts or forwarded to SIEM platforms.
@@ -81,7 +81,7 @@ Traffic is inspected by the Snort Detection Engine using the custom rule set. Ma
 # 🔄 Detection Workflow
 
 <p align="center">
-<img src="images/work2.jpg" width="900">
+<img src="images/workflow.png" width="900">
 </p>
 
 The workflow consists of:
