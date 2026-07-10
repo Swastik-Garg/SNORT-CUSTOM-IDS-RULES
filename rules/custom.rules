@@ -2,7 +2,7 @@
 # File        : custom.rules
 # Project     : Snort 3 Detection Engineering Rule Pack
 # Author      : Swastik Garg
-# Version     : 2.0.0
+# Version     : 1.0.0
 # License     : MIT
 #
 # Description:
@@ -169,129 +169,7 @@ alert icmp any any -> $HOME_NET any (
 
 
 ###############################################################################
-# SECTION 3 — WEB APPLICATION ATTACKS
-###############################################################################
-
-#
-# SQL Injection - UNION SELECT
-#
-
-alert http (
-    msg:"[WEB] SQL Injection - UNION SELECT";
-    flow:to_server,established;
-    http_uri;
-    content:"union",fast_pattern,nocase;
-    content:"select",nocase;
-    classtype:web-application-attack;
-    sid:1000010;
-    rev:1;
-)
-
-#
-# SQL Injection Test
-#
-
-alert http (
-    msg:"[WEB] SQL Injection Test";
-    flow:to_server,established;
-    http_raw_uri;
-    content:"id=";
-    content:"1%3D1";
-    sid:1000011;
-    rev:3;
-)
-
-#
-# Directory Traversal
-#
-
-alert http (
-    msg:"[WEB] Directory Traversal";
-    flow:to_server,established;
-    http_raw_uri;
-    content:"../";
-    classtype:web-application-attack;
-    sid:1000012;
-    rev:1;
-)
-
-#
-# Access to /etc/passwd
-#
-
-alert http (
-    msg:"[WEB] Access Attempt - /etc/passwd";
-    flow:to_server,established;
-    http_uri;
-    content:"/etc/passwd",fast_pattern;
-    classtype:attempted-recon;
-    sid:1000013;
-    rev:1;
-)
-
-#
-# Cross Site Scripting
-#
-
-alert http (
-    msg:"[WEB] Cross Site Scripting";
-    flow:to_server,established;
-    http_raw_uri;
-    content:"%3Cscript",fast_pattern,nocase;
-    classtype:web-application-attack;
-    priority:2;
-    sid:1000014;
-    rev:2;
-)
-
-#
-# Command Injection
-#
-
-alert http (
-    msg:"[WEB] Command Injection";
-    flow:to_server,established;
-    http_uri;
-    pcre:"/(\;|\|\||&&)\s*(cat|id|whoami|uname|pwd)/i";
-    classtype:web-application-attack;
-    sid:1000015;
-    rev:1;
-)
-
-#
-# Suspicious PowerShell
-#
-
-alert http (
-    msg:"[WEB] PowerShell Download";
-    flow:to_server,established;
-    http_uri;
-    content:"powershell",fast_pattern,nocase;
-    classtype:trojan-activity;
-    sid:1000016;
-    rev:1;
-)
-
-#
-# cmd.exe
-#
-
-alert http (
-    msg:"[WEB] cmd.exe Request";
-    flow:to_server,established;
-    http_uri;
-    content:"cmd.exe",fast_pattern,nocase;
-    classtype:web-application-attack;
-    sid:1000017;
-    rev:1;
-)
-
-###############################################################################
-# END OF SECTION 3 — WEB APPLICATION ATTACKS
-###############################################################################
-
-###############################################################################
-# SECTION 4 — AUTHENTICATION ATTACK DETECTION
+# SECTION 3 — AUTHENTICATION ATTACK DETECTION
 ###############################################################################
 
 #
@@ -346,57 +224,13 @@ alert tcp any any -> $HOME_NET 21 (
     rev:1;
 )
 
-#
-# Telnet Login
-#
-
-alert tcp any any -> $HOME_NET 23 (
-    msg:"[AUTH] Telnet Connection";
-    flow:to_server,established;
-    classtype:misc-activity;
-    priority:2;
-    metadata:
-        service telnet;
-    sid:1000023;
-    rev:1;
-)
-
-#
-# RDP Connection
-#
-
-alert tcp any any -> $HOME_NET 3389 (
-    msg:"[AUTH] Remote Desktop Connection";
-    flow:to_server,established;
-    classtype:misc-activity;
-    priority:2;
-    metadata:
-        service rdp;
-    sid:1000024;
-    rev:1;
-)
-
-#
-# SMB Login
-#
-
-alert tcp any any -> $HOME_NET 445 (
-    msg:"[AUTH] SMB Login Activity";
-    flow:to_server,established;
-    classtype:misc-activity;
-    priority:2;
-    metadata:
-        service smb;
-    sid:1000025;
-    rev:1;
-)
 
 ###############################################################################
-# END OF SECTION 4 — AUTHENTICATION ATTACK DETECTION
+# END OF SECTION 3 — AUTHENTICATION ATTACK DETECTION
 ###############################################################################
 
 ###############################################################################
-# SECTION 5 — DNS DETECTION
+# SECTION 4 — DNS DETECTION
 ###############################################################################
 
 #
@@ -434,11 +268,11 @@ alert udp any any -> any 53 (
 )
 
 ###############################################################################
-# END OF SECTION 5 — DNS DETECTION
+# END OF SECTION 4 — DNS DETECTION
 ###############################################################################
 
 ###############################################################################
-# SECTION 6 — SMB DETECTION
+# SECTION 5 — SMB DETECTION
 ###############################################################################
 
 #
@@ -476,12 +310,12 @@ alert tcp any any -> $HOME_NET 445 (
 )
 
 ###############################################################################
-# END OF SECTION 6 — SMB DETECTION
+# END OF SECTION 5 — SMB DETECTION
 ###############################################################################
 
 
 ###############################################################################
-# SECTION 7 — DATA EXFILTRATION
+# SECTION 6 — DATA EXFILTRATION
 ###############################################################################
 
 #
@@ -537,12 +371,12 @@ alert icmp any any -> any any (
 )
 
 ###############################################################################
-# END OF SECTION 7 — DATA EXFILTRATION
+# END OF SECTION 6 — DATA EXFILTRATION
 ###############################################################################
 
 
 ###############################################################################
-# SECTION 8 — MALWARE & COMMAND-AND-CONTROL DETECTION
+# SECTION 7 — MALWARE & COMMAND-AND-CONTROL 
 ###############################################################################
 
 #
@@ -610,6 +444,9 @@ alert tcp any any -> $HOME_NET any (
     msg:"[MALWARE] Possible Reverse Shell";
     flow:to_client,established;
     content:"/bin/sh";
+    content:"-i";
+    distance:0;
+    within:20;
     classtype:shellcode-detect;
     priority:1;
     metadata:
@@ -624,7 +461,7 @@ alert tcp any any -> $HOME_NET any (
 #
 
 alert http (
-    msg:"[MALWARE] Suspicious User-Agent";
+    msg:"[POLICY] curl User-Agent";
     flow:to_server,established;
     http_header;
     content:"curl/",fast_pattern,nocase;
@@ -643,7 +480,7 @@ alert http (
 #
 
 alert http (
-    msg:"[MALWARE] Wget User-Agent";
+    msg:"[POLICY] Wget User-Agent";
     flow:to_server,established;
     http_header;
     content:"Wget",fast_pattern,nocase;
@@ -691,11 +528,11 @@ alert tcp any any -> $HOME_NET any (
 )
 
 ###############################################################################
-# END OF SECTION 8 — MALWARE & COMMAND-AND-CONTROL DETECTION
+# END OF SECTION 7 — MALWARE & COMMAND-AND-CONTROL
 ###############################################################################
 
 ###############################################################################
-# SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
+# SECTION 8 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
 ###############################################################################
 
 #
@@ -799,32 +636,28 @@ alert tcp any any -> $HOME_NET any (
 )
 
 ###############################################################################
-# END OF SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
+# END OF SECTION 8 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
 ###############################################################################
 
 ###############################################################################
 # END OF FILE
 #
 # Project  : Snort 3 Detection Engineering Rule Pack
-# Version  : 2.0.0
+# Version  : 1.0.0
 # Author   : Swastik Garg
 #
 # Rule Categories
 # ----------------
-# ✓ Reconnaissance
-# ✓ ICMP Attacks
-# ✓ Web Application Attacks
-# ✓ Authentication Attacks
-# ✓ DNS Detection
-# ✓ SMB Detection
-# ✓ Data Exfiltration
-# ✓ Malware & Command-and-Control
-# ✓ Policy Violations
+# ✓ Reconnaissance Detection
+# ✓ ICMP Detection
+# ✓ Authentication Attack Detection
+# ✓ DNS Monitoring
+# ✓ SMB Activity Detection
+# ✓ Data Exfiltration Detection
+# ✓ Malware & Command-and-Control Indicators
+# ✓ Policy Violation Detection
 #
 # Total Custom Rules : 31
 #
 # Repository:
 # https://github.com/Swastik-Garg/SNORT-CUSTOM-IDS-RULES
-###############################################################################
-# END OF SECTION 9 — POLICY VIOLATIONS & SUSPICIOUS FILE TRANSFERS
-###############################################################################
