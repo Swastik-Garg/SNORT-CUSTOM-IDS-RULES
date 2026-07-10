@@ -138,6 +138,8 @@ SNORT-CUSTOM-IDS-RULES
 
 # 🚀 Installation
 
+Prerequisite: Install Snort 3 before using this rule set. This repository contains only custom detection rules and supporting documentation.
+
 Clone the repository
 
 ```bash
