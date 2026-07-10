@@ -13,16 +13,16 @@
 <h1 align="center">🛡️ Snort Custom IDS/IPS Rules</h1>
 
 <p align="center">
-Enterprise-grade Snort 3 IDS/IPS detection rules for identifying reconnaissance, web application attacks, brute-force attempts, malware activity, command-and-control traffic, DNS abuse, SMB attacks, and data exfiltration. Designed, tested, and validated on Kali Linux using Snort 3.
+Custom Snort 3 IDS detection rules for detecting reconnaissance, authentication attacks, DNS abuse, SMB activity, malware indicators, command-and-control traffic, and data exfiltration. Developed and tested using Snort 3 on Kali Linux.
 </p>
 
 ---
 
 # 📖 Overview
 
-Modern enterprise networks face continuous threats from attackers performing reconnaissance, brute-force attacks, web exploitation, malware deployment, and data theft.
+Modern enterprise networks face continuous threats from attackers performing reconnaissance, network scanning, authentication attacks, malware deployment, command-and-control communications, and data exfiltration.
 
-This project provides a collection of professionally written custom Snort IDS/IPS rules designed to detect these attack techniques in real-time.
+This project provides a collection of custom Snort 3 detection rules for identifying reconnaissance activity, network scanning, authentication attacks, DNS abuse, SMB activity, malware indicators, command-and-control traffic, reverse shells, and suspicious network behavior.
 
 It is intended for:
 
@@ -48,23 +48,22 @@ It is intended for:
 
 # ✨ Features
 
-- TCP SYN Port Scan Detection
+- TCP SYN Scan Detection
+- TCP FIN Scan Detection
+- TCP NULL Scan Detection
+- TCP XMAS Scan Detection
+- UDP Scan Detection
 - ICMP Flood Detection
 - Directory Traversal Detection
-- Linux `/etc/passwd` Access Detection
-- SQL Injection Detection
-- Cross Site Scripting (XSS)
-- FTP Brute Force Detection
-- SSH Brute Force Detection
-- SMB Access Detection
+- Linux /etc/passwd Access Detection
+- FTP Brute-Force Detection
+- SSH Brute-Force Detection
+- SMB Activity Detection
 - DNS Tunneling Detection
-- DNS Amplification Detection
-- SQLMap Detection
-- Nikto Detection
-- Nmap XMAS Scan Detection
+- Large File Transfer Detection
 - Reverse Shell Detection
-- Large HTTP POST Detection
-- IPS Blocking Rules
+- Malware & Command-and-Control Indicators
+- Policy Violation Detection
 
 ---
 
@@ -162,7 +161,12 @@ sudo nano /etc/snort/snort.lua
 Inside the `ips` section add:
 
 ```lua
-include = "/etc/snort/rules/custom.rules"
+ips =
+{
+    rules = [[
+        include /etc/snort/rules/custom.rules
+    ]]
+}
 ```
 
 ---
@@ -217,13 +221,6 @@ ping -f <Target-IP>
 
 ---
 
-## Cross Site Scripting
-
-```
-<script>alert(1)</script>
-```
-
----
 
 ## FTP Brute Force
 
@@ -248,15 +245,11 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 | TCP SYN Scan | ✅ |
 | ICMP Flood | ✅ |
 | Directory Traversal | ✅ |
-| SQL Injection | ✅ |
-| Cross Site Scripting | ✅ |
 | FTP Brute Force | ✅ |
 | SSH Brute Force | ✅ |
 | SMB Detection | ✅ |
 | DNS Tunneling | ✅ |
 | DNS Amplification | ✅ |
-| SQLMap Detection | ✅ |
-| Nikto Detection | ✅ |
 | Reverse Shell | ✅ |
 | Data Exfiltration | ✅ |
 
@@ -267,7 +260,7 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 | Metric | Value |
 |---------|------:|
 | Snort Version | 3.x |
-| Custom Rules | Growing |
+| Custom Rules | 31 |
 | Attack Categories | 10+ |
 | Documentation Files | 4 |
 | Tested Platform | Kali Linux |
@@ -297,14 +290,6 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 
 <p align="center">
 <img src="images/icmp.png" width="900">
-</p>
-
----
-
-## Cross Site Scripting Detection
-
-<p align="center">
-<img src="images/xss.png" width="900">
 </p>
 
 ---
@@ -340,13 +325,13 @@ Complete documentation is available in the **docs** directory.
 
 # 🛠 Future Improvements
 
-- Additional Detection Rules
-- MITRE ATT&CK Mapping
-- CVE References
-- PCAP Test Suite
-- GitHub Actions Automated Testing
-- SIEM Integration Examples
-- Community Rule Contributions
+- Additional malware signatures
+- More reconnaissance detection rules
+- TLS and HTTP protocol inspection
+- PCAP-based automated rule testing
+- GitHub Actions CI validation
+- SIEM integration examples
+- MITRE ATT&CK mapping
 
 ---
 
