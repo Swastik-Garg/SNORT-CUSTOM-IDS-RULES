@@ -205,9 +205,30 @@ Replace **eth0** with your monitoring interface.
 ## TCP SYN Scan
 
 ```bash
-nmap -sS <Target-IP>
+sudo nmap -sS <Target-IP>
 ```
 
+---
+
+## TCP FIN Scan
+
+```bash
+sudo nmap -sF <Target-IP>
+```
+---
+
+## TCP NULL Scan
+
+```bash
+sudo nmap -sN <Target-IP>
+```
+---
+
+## TCP XMAS Scan
+
+```bash
+sudo nmap -sX <Target-IP>
+```
 ---
 
 ### ICMP Flood
@@ -223,7 +244,6 @@ ping -f <Target-IP>
 
 ---
 
-
 ## FTP Brute Force
 
 ```bash
@@ -232,13 +252,14 @@ hydra -l admin -P rockyou.txt ftp://<Target-IP>
 
 ---
 
-## SSH Brute Force
+## UDP Port Scan
 
 ```bash
-hydra -l root -P rockyou.txt ssh://<Target-IP>
+sudo nmap -sU --top-ports 20 <Target-IP>
 ```
 
 ---
+
 
 # 📊 Detection Coverage
 
@@ -288,6 +309,30 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 
 ---
 
+## TCP FIN Scan Detection
+
+<p align="center">
+<img src="images/fin-scan.png" width="900">
+</p>
+
+---
+
+## TCP NULL Scan Detection
+
+<p align="center">
+<img src="images/null-scan.png" width="900">
+</p>
+
+---
+
+## TCP XMAS Scan Detection
+
+<p align="center">
+<img src="images/xmas-scan.png" width="900">
+</p>
+
+---
+
 ## ICMP Flood Detection
 
 <p align="center">
@@ -304,13 +349,14 @@ hydra -l root -P rockyou.txt ssh://<Target-IP>
 
 ---
 
-## SSH Brute Force Detection
+## UDP Port Scan Detection
 
 <p align="center">
-<img src="images/ssh.png" width="900">
+<img src="images/udp-scan.png" width="900">
 </p>
 
 ---
+
 
 # 📚 Documentation
 
