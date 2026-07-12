@@ -440,20 +440,16 @@ alert http (
 # Reverse Shell Indicator
 #
 
-alert tcp any any -> $HOME_NET any (
-    msg:"[MALWARE] Possible Reverse Shell";
-    flow:to_client,established;
-    content:"/bin/sh";
-    content:"-i";
-    distance:0;
-    within:20;
+alert tcp any any -> $HOME_NET 4444 (
+    msg:"[C2] Reverse Shell Connection";
+    flow:to_server,established;
     classtype:shellcode-detect;
     priority:1;
     metadata:
         mitre_tactic Command_And_Control,
-        mitre_technique T1059.004;
+        mitre_technique T1071;
     sid:1000043;
-    rev:1;
+    rev:2;
 )
 
 #
@@ -494,38 +490,7 @@ alert http (
     rev:1;
 )
 
-#
-# Meterpreter Indicator
-#
 
-alert tcp any any -> $HOME_NET any (
-    msg:"[MALWARE] Possible Meterpreter Traffic";
-    flow:established;
-    content:"metsrv";
-    classtype:trojan-activity;
-    priority:1;
-    metadata:
-        mitre_tactic Command_And_Control,
-        mitre_technique T1219;
-    sid:1000046;
-    rev:1;
-)
-
-#
-# Generic Base64 Payload
-#
-
-alert tcp any any -> $HOME_NET any (
-    msg:"[MALWARE] Suspicious Base64 Payload";
-    flow:established;
-    pcre:"/([A-Za-z0-9+\/]{150,}={0,2})/";
-    classtype:bad-unknown;
-    priority:2;
-    metadata:
-        mitre_tactic Defense_Evasion;
-    sid:1000047;
-    rev:1;
-)
 
 ###############################################################################
 # END OF SECTION 7 — MALWARE & COMMAND-AND-CONTROL
