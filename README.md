@@ -269,11 +269,9 @@ sudo nmap -sU --top-ports 20 <Target-IP>
 | ICMP Flood | ✅ |
 | Directory Traversal | ✅ |
 | FTP Brute Force | ✅ |
-| SSH Brute Force | ✅ |
 | SMB Detection | ✅ |
 | DNS Tunneling | ✅ |
 | DNS Amplification | ✅ |
-| Reverse Shell | ✅ |
 | Data Exfiltration | ✅ |
 
 ---
