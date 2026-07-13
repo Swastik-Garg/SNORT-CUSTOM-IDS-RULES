@@ -13,7 +13,7 @@
 <h1 align="center">🛡️ Snort Custom IDS/IPS Rules</h1>
 
 <p align="center">
-Custom Snort 3 IDS detection rules for detecting reconnaissance, authentication attacks, DNS abuse, SMB activity, malware indicators, command-and-control traffic, and data exfiltration. Developed and tested using Snort 3 on Kali Linux.
+Custom Snort 3 IDS detection rules for detecting reconnaissance, authentication attacks, DNS activity, SMB traffic, policy violations, malware indicators, and data exfiltration. Developed and tested using Snort 3 on Kali Linux.
 </p>
 
 ---
@@ -22,7 +22,7 @@ Custom Snort 3 IDS detection rules for detecting reconnaissance, authentication 
 
 Modern enterprise networks face continuous threats from attackers performing reconnaissance, network scanning, authentication attacks, malware deployment, command-and-control communications, and data exfiltration.
 
-This project provides a collection of custom Snort 3 detection rules for identifying reconnaissance activity, network scanning, authentication attacks, DNS abuse, SMB activity, malware indicators, command-and-control traffic, reverse shells, and suspicious network behavior.
+This project provides a collection of custom Snort 3 detection rules designed for cybersecurity laboratories and learning environments. The rule set covers reconnaissance detection, authentication attacks, DNS monitoring, SMB activity, data exfiltration indicators, malware-related traffic, and policy violations while demonstrating custom rule development for Snort 3.
 
 It is intended for:
 
@@ -54,15 +54,13 @@ It is intended for:
 - TCP XMAS Scan Detection
 - UDP Scan Detection
 - ICMP Flood Detection
-- Directory Traversal Detection
-- Linux /etc/passwd Access Detection
 - FTP Brute-Force Detection
 - SSH Brute-Force Detection
 - SMB Activity Detection
-- DNS Tunneling Detection
+- DNS Monitoring
+- Large HTTP Upload Detection
 - Large File Transfer Detection
-- Reverse Shell Detection
-- Malware & Command-and-Control Indicators
+- Malware Indicators
 - Policy Violation Detection
 
 ---
@@ -202,6 +200,8 @@ Replace **eth0** with your monitoring interface.
 
 # 🧪 Testing Examples
 
+The following examples were used to validate supported detection rules in a controlled laboratory environment.
+
 ## TCP SYN Scan
 
 ```bash
@@ -267,11 +267,13 @@ sudo nmap -sU --top-ports 20 <Target-IP>
 |----------|-----------|
 | TCP SYN Scan | ✅ |
 | ICMP Flood | ✅ |
-| Directory Traversal | ✅ |
+| TCP FIN Scan | ✅ |
+| TCP NULL Scan | ✅ |
+| TCP XMAS Scan | ✅ |
+| UDP Scan | ✅ |
 | FTP Brute Force | ✅ |
 | SMB Detection | ✅ |
 | DNS Tunneling | ✅ |
-| DNS Amplification | ✅ |
 | Data Exfiltration | ✅ |
 
 ---
@@ -282,7 +284,7 @@ sudo nmap -sU --top-ports 20 <Target-IP>
 |---------|------:|
 | Snort Version | 3.x |
 | Custom Rules | 31 |
-| Attack Categories | 10+ |
+| Attack Categories | 8 |
 | Documentation Files | 4 |
 | Tested Platform | Kali Linux |
 | License | MIT |
@@ -378,6 +380,11 @@ Complete documentation is available in the **docs** directory.
 - GitHub Actions CI validation
 - SIEM integration examples
 - MITRE ATT&CK mapping
+- HTTP inspection enhancements
+- HTTPS/TLS detection
+- SIEM log forwarding examples
+- Docker lab deployment
+- Automated rule testing using GitHub Actions
 
 ---
 
@@ -406,6 +413,20 @@ The author is not responsible for misuse of this project.
 This project is licensed under the MIT License.
 
 See the **LICENSE** file for details.
+
+---
+
+# 🧪 Lab Environment
+
+The project was developed and validated in a controlled virtual lab.
+
+| Component | Environment |
+|----------|-------------|
+| Host OS | Kali Linux |
+| IDS Engine | Snort 3 |
+| Target | Metasploitable 2 |
+| Testing Tools | Nmap, Hydra, hping3 |
+| Virtualization | VMware Workstation |
 
 ---
 
